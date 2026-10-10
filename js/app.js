@@ -1,5 +1,5 @@
-// Escudo solar: interacciones sobre los materiales del GLB mediante la API de scene-graph de model-viewer.
-// Materiales del modelo: "Bronce", "Acero", "Madera", "Cuero".
+// Escudo medieval: interacciones sobre los materiales del GLB mediante la API de scene-graph de model-viewer.
+// Materiales del modelo: "Madera", "Acero", "Bronce".
 (() => {
   'use strict';
 
@@ -10,11 +10,11 @@
     rotate: $('btn-rotate'), reset: $('btn-reset'), status: $('status'),
   };
   const TEX_DIR = 'assets/textures/';
+  const NAMES = ['Madera', 'Acero', 'Bronce'];
   const state = { finish: 'aged', bump: true };
-  let bronze, leather;          // materiales de model-viewer
-  const aged = {};              // texturas originales del bronce (embebidas en el GLB)
-  let clean = null;             // texturas del bronce limpio (carga bajo demanda)
-  let leatherNormal = null;
+  const mats = {};      // nombre -> material de model-viewer
+  const aged = {};      // texturas originales (embebidas en el GLB = acabado envejecido)
+  let clean = null;     // texturas del acabado limpio (se cargan bajo demanda)
 
   function showStatus(msg, info = false) {
     ui.status.textContent = msg;
@@ -23,44 +23,49 @@
   }
   const press = (btn, on) => btn.setAttribute('aria-pressed', String(on));
 
-  // Aplica al bronce las texturas del acabado actual; el normal map depende del botón de relieve
-  function applyBronze() {
-    const t = state.finish === 'clean' ? clean : aged;
-    const pbr = bronze.pbrMetallicRoughness;
-    pbr.baseColorTexture.setTexture(t.base);
-    pbr.metallicRoughnessTexture.setTexture(t.orm);
-    bronze.normalTexture.setTexture(state.bump ? t.normal : null);
+  // Aplica a los tres materiales las texturas del acabado actual; el normal map depende del botón 3
+  function applyTextures() {
+    const set = state.finish === 'clean' ? clean : aged;
+    for (const n of NAMES) {
+      const m = mats[n], t = set[n];
+      m.pbrMetallicRoughness.baseColorTexture.setTexture(t.base);
+      m.pbrMetallicRoughness.metallicRoughnessTexture.setTexture(t.orm);
+      m.normalTexture.setTexture(state.bump ? t.normal : null);
+    }
   }
 
-  // 1 y 2) Bronce limpio / envejecido: cambian color base, rugosidad y metalicidad (pátina) del material "Bronce"
+  // 1 y 2) Acabado limpio / envejecido: cambian color base, rugosidad, metalicidad y relieve de los materiales
   async function setFinish(finish) {
     if (finish === state.finish) return;
     ui.clean.disabled = ui.aged.disabled = true;
     try {
       if (finish === 'clean' && !clean) {
-        showStatus('Cargando bronce limpio…', true);
-        const [base, orm, normal] = await Promise.all(
-          ['color', 'orm', 'normal'].map((s) => mv.createTexture(`${TEX_DIR}bronce_limpio_${s}.jpg`)));
-        clean = { base, orm, normal };
+        showStatus('Cargando acabado limpio…', true);
+        const loaded = {};
+        for (const n of NAMES) {
+          const [base, orm, normal] = await Promise.all(
+            ['color', 'orm', 'normal'].map((s) => mv.createTexture(`${TEX_DIR}${n.toLowerCase()}_limpio_${s}.jpg`)));
+          loaded[n] = { base, orm, normal };
+        }
+        clean = loaded;
         showStatus('');
       }
       state.finish = finish;
-      applyBronze();
+      applyTextures();
       press(ui.clean, finish === 'clean');
       press(ui.aged, finish === 'aged');
     } catch (e) {
       console.error(e);
-      showStatus('No se pudo cargar la textura del bronce limpio. Revisa tu conexión y reintenta.');
+      showStatus('No se pudieron cargar las texturas del acabado limpio. Revisa tu conexión y reintenta.');
     } finally {
       ui.clean.disabled = ui.aged.disabled = false;
     }
   }
 
-  // 3) Relieve: activa/desactiva el normal map del bronce y de los paneles de cuero
+  // 3) Relieve normal: activa/desactiva el normal map de madera, acero y bronce
   function toggleBump() {
     state.bump = !state.bump;
-    applyBronze();
-    leather.normalTexture.setTexture(state.bump ? leatherNormal : null);
+    applyTextures();
     press(ui.bump, state.bump);
     ui.lblBump.textContent = state.bump ? 'activado' : 'desactivado';
   }
@@ -80,14 +85,16 @@
   });
 
   mv.addEventListener('load', () => {
-    const find = (n) => mv.model.materials.find((m) => m.name === n);
-    bronze = find('Bronce');
-    leather = find('Cuero');
-    if (!bronze || !leather) { showStatus('El modelo no contiene los materiales esperados (Bronce, Cuero).'); return; }
-    aged.base = bronze.pbrMetallicRoughness.baseColorTexture.texture;
-    aged.orm = bronze.pbrMetallicRoughness.metallicRoughnessTexture.texture;
-    aged.normal = bronze.normalTexture.texture;
-    leatherNormal = leather.normalTexture.texture;
+    for (const n of NAMES) {
+      const m = mv.model.materials.find((x) => x.name === n);
+      if (!m) { showStatus(`El modelo no contiene el material "${n}".`); return; }
+      mats[n] = m;
+      aged[n] = {
+        base: m.pbrMetallicRoughness.baseColorTexture.texture,
+        orm: m.pbrMetallicRoughness.metallicRoughnessTexture.texture,
+        normal: m.normalTexture.texture,
+      };
+    }
     showStatus('');
     document.querySelector('.progress')?.setAttribute('hidden', '');
     [ui.clean, ui.aged, ui.bump].forEach((b) => (b.disabled = false));

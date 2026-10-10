@@ -3,26 +3,26 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Escudo Solar 3D</title>
-  <meta name="description" content="Escudo circular de bronce 3D interactivo con materiales PBR (bronce, acero, madera y cuero), hecho para la web con model-viewer.">
+  <title>Escudo Medieval 3D</title>
+  <meta name="description" content="Escudo medieval heráldico 3D interactivo con materiales PBR (madera, acero y bronce), hecho para la web con model-viewer.">
   <link rel="stylesheet" href="css/styles.css">
   <!-- model-viewer 4.4.0 (Google) -->
   <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.4.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
   <header class="top">
-    <h1>Escudo <span>Solar</span></h1>
-    <p>Bronce, cuero, acero y madera · modelo 3D PBR interactivo</p>
+    <h1>Escudo <span>Medieval</span></h1>
+    <p>Madera, hierro y bronce · modelo 3D PBR interactivo</p>
   </header>
 
   <main>
     <section class="stage" aria-label="Visor 3D del escudo">
       <model-viewer id="shield"
         src="assets/shield.glb"
-        alt="Escudo circular de bronce con radios, paneles oscuros de escamas, medallón solar y adornos curvos"
+        alt="Escudo medieval vertical de tablones oscuros con marco de hierro remachado, boss central, ornamentos góticos y rombos de bronce"
         camera-controls
         touch-action="pan-y"
-        camera-orbit="0deg 85deg auto"
+        camera-orbit="-20deg 85deg auto"
         min-camera-orbit="auto auto 0.8m"
         max-camera-orbit="auto auto 4m"
         interaction-prompt="auto"
@@ -37,17 +37,17 @@
     </section>
 
     <aside class="panel">
-      <h2>Bronce y relieve</h2>
+      <h2>Materiales</h2>
       <!-- Tres controles principales: modifican en tiempo real los materiales del GLB (ver js/app.js) -->
       <div class="actions">
         <button id="btn-clean" class="btn" aria-pressed="false" disabled>
-          <b>Bronce limpio</b><span>Brillante, poco rugoso</span>
+          <b>Acabado limpio</b><span>Madera cuidada, acero y bronce brillantes</span>
         </button>
         <button id="btn-aged" class="btn" aria-pressed="true" disabled>
-          <b>Bronce envejecido</b><span>Pátina, suciedad, más rugoso</span>
+          <b>Acabado envejecido</b><span>Óxido, pátina, grietas y suciedad</span>
         </button>
         <button id="btn-bump" class="btn" aria-pressed="true" disabled>
-          <b>Relieve <span id="lbl-bump" class="inl">activado</span></b><span>Normal map del bronce y los paneles</span>
+          <b>Relieve normal <span id="lbl-bump" class="inl">activado</span></b><span>Normal map de madera, acero y bronce</span>
         </button>
       </div>
 
