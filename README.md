@@ -1,91 +1,73 @@
-# Escudo Medieval 3D
+# Escudo Solar 3D
 
-Escudo medieval modelado, texturizado (PBR) y exportado a GLB, mostrado en una página responsive con
-[`<model-viewer>`](https://modelviewer.dev/) de Google (v4.4.0).
+Escudo circular de bronce con paneles oscuros de escamas, radios metálicos, medallón solar y dos adornos curvos
+simétricos, modelado y texturizado desde cero (versión 2) y mostrado con [`<model-viewer>`](https://modelviewer.dev/) 4.4.0.
+Inspirado visualmente en una imagen de referencia; todo el modelado y las texturas son propios y procedurales.
 
 ![Vista general](screenshots/escritorio-vista-general.png)
 ![Interacción activa](screenshots/escritorio-interaccion.png)
 
-## Publicación
-
-- **Página pública:** https://dgael-22.github.io/escudo/
+- **Sitio publicado:** https://dgael-22.github.io/escudo/
 - **Repositorio:** https://github.com/dgael-22/escudo
+- **Modelo:** [`assets/shield.glb`](assets/shield.glb) (≈ 0,9 MB)
 
-## Descripción del modelo
+## Modelo
 
-Escudo heráldico (forma «heater») con cuerpo de tablas de madera ligeramente curvado, reborde de acero que envuelve
-todo el canto, flejes de acero en cruz con remaches (13 en el reborde y 8 en los flejes) y un emblema de bronce
-formado por una placa de estrella de 8 puntas y una cúpula (umbo) con anillos grabados. La silueta aporta la lectura
-principal; el detalle fino (vetas, juntas entre tablas, cepillado, grabados, óxido, cardenillo) viene de las texturas.
+Silueta circular (Ø 1 m) con ligera curvatura de cúpula. La profundidad se limita a lo esencial: reborde trenzado,
+medallón solar escalonado, 12 radios arqueados, adornos superior/inferior (tridente en media luna con bulbo) y remaches.
+Las escamas de los paneles **no están modeladas**: son normal map + roughness + base color sobre 12 paneles planos.
 
-## Materiales (nombres en el GLB)
-
-| Material | Pieza | Metálico | Rugosidad |
-|---|---|---|---|
-| `Madera` | Cuerpo | 0 | alta (~0.55–0.8) |
-| `Acero`  | Reborde, flejes, remaches | 1 | baja/media (~0.26–0.5) |
-| `Bronce` | Placa estrella y cúpula | 1 | media-baja (~0.32–0.45) |
-
-Los tres usan Principled BSDF en Blender y se exportan como `pbrMetallicRoughness` + `normalTexture` de glTF.
-
-## Polígonos
-
-≈ **3 650 triángulos** en total: Madera 1 536 · Acero 1 824 · Bronce 296 (3 mallas, 3 materiales, 3 draw calls).
-Sin geometría oculta ni duplicada (se eliminan vértices duplicados y sueltos, normales recalculadas hacia fuera,
-transformaciones aplicadas, escala real en metros ≈ 0.8 × 1.0 m).
-
-## UVs y texturas
-
-| Material | Resolución | Mapas (embebidos en el GLB, estado limpio) |
+| Pieza | Material | Triángulos |
 |---|---|---|
-| Madera | 1024 × 1024 | Base Color, ORM (G = roughness, B = metallic), Normal |
-| Acero  | 512 × 512   | Base Color, ORM, Normal |
-| Bronce | 512 × 512   | Base Color, ORM, Normal |
+| Reborde, 12 radios, medallón solar, adornos | `Bronce` | 3 384 |
+| 24 remaches de reborde, 12 de radios, anillo fino | `Acero` | 1 152 |
+| Disco trasero | `Madera` | 1 440 |
+| 12 paneles frontales | `Cuero` | 768 |
+| **Total** | 4 mallas, 4 materiales | **≈ 6 750** |
 
-- **Madera:** frente en la mitad izquierda de la textura y dorso (espejado) en la derecha, sin solapes; la pared del canto
-  queda oculta bajo el reborde.
-- **Acero:** `Smart UV Project` + empaquetado de islas en el espacio 0-1.
-- **Bronce:** proyección planar frontal a modo de «calcomanía» (placa y cúpula comparten el mismo dibujo; solapamiento
-  intencional y sin efecto visible porque la cúpula tapa esa zona de la placa).
-- Variante **desgastada** (madera seca y rayada, acero oxidado, bronce con cardenillo): mismos tres mapas por material en
-  `assets/textures/*_desgastado_*.png`, cargados bajo demanda por el botón 1.
-- Las texturas se generan proceduralmente con `tools/make_textures.py` (numpy + Pillow). No se usó Substance Painter.
+## Materiales y texturas (PBR metal/rough, embebidas en el GLB como JPEG q85)
+
+| Material | Uso | Resolución | Mapas |
+|---|---|---|---|
+| `Bronce` (envejecido por defecto) | borde, radios, medallón, adornos | 1024² (atlas) | Base Color, ORM (G rough, B metal), Normal |
+| `Acero` oscuro | remaches y anillo | 512² | Base Color, ORM, Normal |
+| `Madera` oscura | parte trasera | 1024² | Base Color, ORM, Normal |
+| `Cuero` oscuro | paneles frontales (escamas) | 512² | Base Color, ORM, Normal |
+
+Fuera del GLB: `assets/textures/bronce_limpio_*.jpg` (1024², variante de bronce limpio; se carga al pulsar el botón 1).
+
+**UVs:** bronce en un atlas sin solapes (franja superior = reborde con trenza repetible, columna = radios, cuadrante = medallón
+como calcomanía planar, derecha = adornos); los 12 radios comparten región UV a propósito (patrón idéntico) y los paneles de
+cuero usan un patrón repetible. Madera: proyección planar del disco. Acero: Smart UV Project + empaquetado.
+
+## Controles
+
+Los tres botones principales cambian realmente los materiales del GLB vía la API de scene-graph de model-viewer:
+
+1. **Bronce limpio** – sustituye base color, metálico/rugosidad y normal del material `Bronce` por la variante brillante y poco rugosa.
+2. **Bronce envejecido** – restaura la variante con pátina, suciedad y mayor rugosidad (estado inicial).
+3. **Relieve activado/desactivado** – quita o restaura el normal map del `Bronce` y de las escamas del `Cuero`.
+
+Además: órbita, zoom, **Auto-rotar** y **Reiniciar vista**. Se muestra un mensaje si el modelo o las texturas no cargan.
 
 ## Herramientas
 
-Blender 5.2 (modelado con bmesh por script, UVs, materiales, export glTF), Python/numpy/Pillow (texturas PBR),
-`<model-viewer>` 4.4.0, HTML/CSS/JS sin dependencias de build. Pruebas con Edge headless (`tools/shots.mjs`).
+Blender 5.2 (modelado por script con bmesh, UVs, nodos Principled BSDF, export glTF), Python + numpy + Pillow (texturas
+procedurales), model-viewer 4.4.0, HTML/CSS/JS sin build, Edge headless para las pruebas y capturas.
 
-## Ejecutar localmente
-
-```bash
-python -m http.server 8123
-# abrir http://localhost:8123
-```
-(Debe servirse por HTTP; abrir `index.html` con `file://` no carga el GLB por CORS.)
-
-Regenerar el modelo (opcional): `python tools/make_textures.py` y
-`blender -b -P tools/build_shield.py` (reescribe `assets/shield.glb`).
-
-## Los tres botones
-
-Todos actúan sobre los materiales del GLB mediante la API de scene-graph de model-viewer (`model.materials`).
-
-1. **Acabado (limpio ↔ desgastado):** sustituye en `Madera`, `Acero` y `Bronce` la textura base, la de
-   metálico/rugosidad y el normal map por las desgastadas (`setTexture`). Cambia color, rugosidad, metalicidad y relieve.
-2. **Color del acero (Natural → Azulado → Negro forjado):** modifica el `baseColorFactor` del material `Acero`
-   (`setBaseColorFactor`), que tiñe la textura sin reemplazarla.
-3. **Relieve del bronce (activado ↔ desactivado):** quita o restaura el normal map del material `Bronce`
-   (`normalTexture.setTexture`), eliminando o devolviendo los grabados y el martillado en la iluminación.
-
-Además hay controles de cámara: órbita y zoom (ratón/táctil), **Auto-rotar** y **Reiniciar vista**.
-Si el modelo o las texturas no cargan, se muestra un mensaje en el visor.
-
-## Publicar (GitHub Pages)
+## Ejecutar en local
 
 ```bash
-gh auth login
-gh repo create escudo --public --source=. --push
-gh api -X POST repos/dgael-22/escudo/pages -f "source[branch]=main" -f "source[path]=/"
+python -m http.server 8123   # abrir http://localhost:8123 (debe servirse por HTTP)
 ```
-La URL será `https://dgael-22.github.io/escudo/`.
+
+Regenerar el modelo: `python fuente-3d/make_textures.py` y luego `blender -b -P fuente-3d/build_shield.py`.
+
+## Qué sustituye a la versión anterior
+
+- **Reemplazados:** `assets/shield.glb` (escudo heráldico → escudo circular), `index.html`, `css/styles.css` (añade un estilo),
+  `js/app.js` (nuevos botones y materiales) y este `README.md`.
+- **Eliminados:** carpeta `tools/` (generador de texturas y script de Blender antiguos), texturas `madera/acero/bronce_desgastado_*.png`
+  y las capturas anteriores.
+- **Nuevos:** `fuente-3d/` (`make_textures.py`, `build_shield.py`, `shots.mjs`, `escudo.blend`, `tex/` con los mapas originales PNG),
+  `assets/textures/bronce_limpio_*.jpg` y capturas nuevas en `screenshots/`.
