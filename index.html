@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escudo Medieval 3D</title>
+  <meta name="description" content="Escudo medieval 3D interactivo con materiales PBR (madera, acero y bronce), hecho para la web con model-viewer.">
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- model-viewer 4.4.0 (Google) -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4.4.0/dist/model-viewer.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <h1>Escudo <span>Medieval</span></h1>
+    <p>Madera, acero y bronce · modelo 3D PBR interactivo</p>
+  </header>
+
+  <main>
+    <section class="stage" aria-label="Visor 3D del escudo">
+      <model-viewer id="shield"
+        src="assets/shield.glb"
+        alt="Escudo medieval de madera con reborde de acero y emblema de bronce"
+        camera-controls
+        touch-action="pan-y"
+        camera-orbit="-25deg 80deg auto"
+        min-camera-orbit="auto auto 0.8m"
+        max-camera-orbit="auto auto 4m"
+        interaction-prompt="auto"
+        environment-image="neutral"
+        shadow-intensity="1.1"
+        shadow-softness="0.9"
+        exposure="1.15"
+        loading="eager">
+        <div class="progress" slot="progress-bar"><div class="bar"></div></div>
+      </model-viewer>
+      <div id="status" class="status" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <aside class="panel">
+      <h2>Apariencia</h2>
+      <!-- Los tres botones modifican los materiales del modelo en tiempo real (ver js/app.js) -->
+      <div class="actions">
+        <button id="btn-wear" class="btn" aria-pressed="false" disabled>
+          <b>1 · Acabado</b><span id="lbl-wear">Limpio</span>
+        </button>
+        <button id="btn-steel" class="btn" disabled>
+          <b>2 · Color del acero</b><span id="lbl-steel">Natural</span>
+        </button>
+        <button id="btn-bump" class="btn" aria-pressed="true" disabled>
+          <b>3 · Relieve del bronce</b><span id="lbl-bump">Activado</span>
+        </button>
+      </div>
+
+      <h2>Cámara</h2>
+      <div class="cam">
+        <button id="btn-rotate" class="btn small" aria-pressed="false">Auto-rotar</button>
+        <button id="btn-reset" class="btn small">Reiniciar vista</button>
+      </div>
+      <p class="hint">Arrastra para orbitar · rueda o pellizco para zoom.</p>
+    </aside>
+  </main>
+
+  <footer>Modelo y texturas propios · <a href="https://modelviewer.dev/" target="_blank" rel="noopener">model-viewer</a></footer>
+  <script src="js/app.js"></script>
+</body>
+</html>
