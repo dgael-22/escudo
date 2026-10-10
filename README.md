@@ -86,6 +86,6 @@ Si el modelo o las texturas no cargan, se muestra un mensaje en el visor.
 ```bash
 gh auth login
 gh repo create escudo-medieval-3d --public --source=. --push
-gh api -X POST repos/<usuario>/escudo-medieval-3d/pages -f "source[branch]=master" -f "source[path]=/"
+gh api -X POST repos/<usuario>/escudo-medieval-3d/pages -f "source[branch]=main" -f "source[path]=/"
 ```
 La URL será `https://<usuario>.github.io/escudo-medieval-3d/`.
