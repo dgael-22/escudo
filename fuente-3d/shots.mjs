@@ -1,4 +1,4 @@
-// Capturas con Edge/Chrome headless via CDP. Uso: node tools/shots.mjs <url> [chrome.exe]
+// Capturas con Edge/Chrome headless via CDP. Uso: node fuente-3d/shots.mjs <url> [chrome.exe]
 import { spawn } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 const url = process.argv[2];
@@ -19,11 +19,11 @@ await send('Runtime.enable'); await send('Log.enable'); await send('Page.enable'
 async function run(w, h, mobile, prefix, doInteract) {
   await send('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile });
   await send('Page.navigate', { url }); await sleep(2000);
-  for (let i = 0; i < 60 && !(await ev("!document.getElementById('btn-wear').disabled")); i++) await sleep(500);
+  for (let i = 0; i < 60 && !(await ev("!document.getElementById('btn-aged').disabled")); i++) await sleep(500);
   await sleep(2500); await shot(`screenshots/${prefix}-vista-general.png`);
   if (doInteract) {
-    await ev("document.getElementById('btn-wear').click()"); await sleep(3500);
-    await ev("document.getElementById('btn-steel').click(); document.getElementById('btn-bump').click()"); await sleep(1500);
+    await ev("document.getElementById('btn-clean').click()"); await sleep(3500);
+    await ev("document.getElementById('btn-bump').click()"); await sleep(1500);
     console.log(await ev("[...document.querySelectorAll('.btn')].map(b=>b.id+':'+b.getAttribute('aria-pressed')).join(' ')"));
     await shot(`screenshots/${prefix}-interaccion.png`);
   }

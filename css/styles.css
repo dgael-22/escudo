@@ -58,3 +58,5 @@ footer a { color: var(--gold); }
   main { grid-template-columns: 1fr; }
   .stage { height: 58vh; min-height: 340px; }
 }
+
+.btn b .inl { font-weight: 700; color: var(--gold); font-size: inherit; }
