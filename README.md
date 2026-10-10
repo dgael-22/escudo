@@ -8,8 +8,8 @@ Escudo medieval modelado, texturizado (PBR) y exportado a GLB, mostrado en una p
 
 ## Publicación
 
-- **Página pública:** _pendiente de publicar_ (ver «Publicar» abajo; se añadirá aquí la URL verificada)
-- **Repositorio:** _pendiente de subir_
+- **Página pública:** https://dgael-22.github.io/escudo/
+- **Repositorio:** https://github.com/dgael-22/escudo
 
 ## Descripción del modelo
 
@@ -85,7 +85,7 @@ Si el modelo o las texturas no cargan, se muestra un mensaje en el visor.
 
 ```bash
 gh auth login
-gh repo create escudo-medieval-3d --public --source=. --push
-gh api -X POST repos/<usuario>/escudo-medieval-3d/pages -f "source[branch]=main" -f "source[path]=/"
+gh repo create escudo --public --source=. --push
+gh api -X POST repos/dgael-22/escudo/pages -f "source[branch]=main" -f "source[path]=/"
 ```
-La URL será `https://<usuario>.github.io/escudo-medieval-3d/`.
+La URL será `https://dgael-22.github.io/escudo/`.
